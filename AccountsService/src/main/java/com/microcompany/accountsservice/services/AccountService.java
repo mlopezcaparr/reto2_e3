@@ -76,6 +76,11 @@ public class AccountService implements IAccountService {
     }
 
     @Override
+    public Integer getUserBalance(Long ownerId) {
+        return accountRepository.getSumAccounts(ownerId);
+    }
+
+    @Override
     public void deleteAccountsUsingOwnerId(Long ownerId) {
         List<Account> accounts = accountRepository.findByOwnerId(ownerId);
         for (Account account : accounts) {

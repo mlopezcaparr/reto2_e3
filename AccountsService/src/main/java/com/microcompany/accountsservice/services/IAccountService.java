@@ -21,6 +21,8 @@ public interface IAccountService {
 
     void delete(Long id);
 
+    Integer getUserBalance(Long ownerId);
+
     void deleteAccountsUsingOwnerId(Long ownerId);
 
 }
