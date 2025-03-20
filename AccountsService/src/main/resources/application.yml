@@ -28,6 +28,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
       generate-ddl: true
+      naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     defer-datasource-initialization: true
   h2:
     console.enabled: true
