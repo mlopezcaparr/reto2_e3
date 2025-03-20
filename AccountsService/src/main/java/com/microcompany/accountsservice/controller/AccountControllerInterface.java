@@ -1,18 +1,21 @@
 package com.microcompany.accountsservice.controller;
 
 import com.microcompany.accountsservice.model.Account;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/cuentas")
 public interface AccountControllerInterface {
 
-    @RequestMapping("")
-    public String testMapping();
 
-    @RequestMapping("/{id}")
-    public Account getCuentaById(@PathVariable("id") long cid);
+    @RequestMapping(value = "/{uid}", method = RequestMethod.GET)
+    public ResponseEntity getCuentaById(@PathVariable("uid") long uid, @RequestParam long cid);
+
+    @RequestMapping(value = "/{uid}/all", method = RequestMethod.GET)
+    public ResponseEntity getUserCuentas(@PathVariable("uid") long uid);
+
+    @RequestMapping(value = "/{uid}/validate", method = RequestMethod.GET)
+    public ResponseEntity validateCuenta(@PathVariable("uid") long uid ,@RequestParam("cantidad") int cant);
 }

@@ -21,11 +21,13 @@ public class Account {
 
     private String type;
 
+    @Column(name = "openingDate")
     @DateTimeFormat
     Date openingDate;
 
     private int balance;
 
+    @Column(name = "ownerId")
     private Long ownerId;
 
     @Transient
