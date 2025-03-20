@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/cuentas")
 public interface AccountControllerInterface {
+
     @RequestMapping("")
     public String testMapping();
 }
