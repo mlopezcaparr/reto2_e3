@@ -1,6 +1,7 @@
 package com.microcompany.accountsservice.controller;
 
 import com.microcompany.accountsservice.model.Account;
+import com.microcompany.accountsservice.payload.ApiResponse;
 import com.microcompany.accountsservice.persistence.AccountRepository;
 import com.microcompany.accountsservice.services.AccountService;
 import org.apache.coyote.Response;
@@ -37,5 +38,35 @@ public class AccountController implements  AccountControllerInterface{
         if(cant < balanceTotal*0.8) validated = true;
         else validated = false;
         return ResponseEntity.status(HttpStatus.OK).body(validated);
+    }
+
+    @Override
+    public ResponseEntity addToAccount(Long ownerid, Long aid, int cantidad) {
+        Account end = serv.addBalance(aid, cantidad, ownerid);
+        if (end != null) {
+            return  ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
+        } else {
+            return new ResponseEntity<>(new ApiResponse(), HttpStatus.NOT_MODIFIED);
+        }
+    }
+
+    @Override
+    public ResponseEntity removeFromAccount(Long ownerid, Long aid, int cantidad) {
+        Account end = serv.withdrawBalance(aid, cantidad, ownerid);
+        if (end != null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
+        } else {
+            return new ResponseEntity<>(new ApiResponse(), HttpStatus.NOT_MODIFIED);
+        }
+    }
+
+    @Override
+    public ResponseEntity updateAccount(Long aid, Account account) {
+        serv.updateAccount(aid, account);
+        if (account != null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
+        } else {
+            return new ResponseEntity<>(new ApiResponse(), HttpStatus.NOT_MODIFIED);
+        }
     }
 }
