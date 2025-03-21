@@ -53,3 +53,8 @@ spring:
 server:
   servlet.contextPath: /api/v1
   port: 9943
+  ssl:
+    key-store: accountKey.p12
+    key-store-password: password
+    keyStoreType: PKCS12
+    keyAlias: accountKey
