@@ -46,8 +46,8 @@ public class AccountController implements AccountControllerInterface {
 
     @Override
     public ResponseEntity addToAccount(Long ownerid, Long aid, int cantidad) {
-        Account end = serv.addBalance(aid, cantidad, ownerid);
-        if (end != null) {
+        Account account = serv.addBalance(aid, cantidad, ownerid);
+        if (!account.equals(null)) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
         } else {
             return new ResponseEntity<>(new ApiResponse(), HttpStatus.NOT_MODIFIED);
@@ -56,18 +56,21 @@ public class AccountController implements AccountControllerInterface {
 
     @Override
     public ResponseEntity removeFromAccount(Long ownerid, Long aid, int cantidad) {
-        Account end = serv.withdrawBalance(aid, cantidad, ownerid);
-        if (end != null) {
+        Account account = serv.getAccount(aid);
+
+        if (isValidated(account.getOwnerId(), cantidad)) {
+            serv.withdrawBalance(aid, cantidad, ownerid);
             return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
         } else {
-            return new ResponseEntity<>(new ApiResponse(), HttpStatus.NOT_MODIFIED);
+            return new ResponseEntity<>(new ApiResponse("El balance superá el 80 por ciento", false),
+                    HttpStatus.NOT_MODIFIED);
         }
     }
 
     @Override
     public ResponseEntity updateAccount(Long aid, Account account) {
         serv.updateAccount(aid, account);
-        if (account != null) {
+        if (!account.equals(null)) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
         } else {
             return new ResponseEntity<>(new ApiResponse(), HttpStatus.NOT_MODIFIED);
