@@ -8,7 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 @RestController
-@RequestMapping("/cuentas")
+@RequestMapping("/accounts")
 public interface AccountControllerInterface {
 
 
@@ -32,4 +32,13 @@ public interface AccountControllerInterface {
     @PutMapping(value = "/{cuentaId}", consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity updateAccount(@Min(1) @PathVariable("cuentaId") Long aid, @Valid @RequestBody Account account);
+
+    @PostMapping(consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    ResponseEntity createAccount(@Valid @RequestBody Account account);
+
+    @DeleteMapping("/{uid}")
+    ResponseEntity deleteAccount(@PathVariable("uid") Long uid, @RequestParam(value = "cuentaId") Long cuentaId);
+
+    @DeleteMapping("/{uid}/all")
+    ResponseEntity deleteUserAccounts(@PathVariable("uid") Long uid);
 }
