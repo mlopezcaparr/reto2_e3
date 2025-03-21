@@ -14,7 +14,7 @@ import javax.validation.constraints.Min;
 public interface AccountControllerInterface {
 
 
-    @RequestMapping(value = "/{uid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{uid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity getCuentaById(@PathVariable("uid") long uid, @RequestParam long cid);
 
     @RequestMapping(value = "/{uid}/all", method = RequestMethod.GET)
