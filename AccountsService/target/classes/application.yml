@@ -1,7 +1,7 @@
 spring:
   application:
     name: AccountsService
-  profiles.active: dev
+  profiles.active: prod
 
 server:
   port: 8080
