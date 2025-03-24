@@ -11,6 +11,8 @@ server:
       include-stacktrace: on_param
       include-exception: false
 
+accounts.openapi.dev-url: "http://localhost:9900"
+accounts.openapi.prod-url: "http://localhost:9943/api/v1"
 
 ---
 spring:
@@ -49,6 +51,17 @@ logging:
 ---
 spring:
   config.activate.on-profile: prod
+  datasource:
+    url: "jdbc:mysql://localhost/accounts_db"
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: account_user
+    password: acc123
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+    hibernate:
+      ddl-auto: update
+      generate-ddl: true
 
 server:
   servlet.contextPath: /api/v1
@@ -58,3 +71,9 @@ server:
     key-store-password: password
     keyStoreType: PKCS12
     keyAlias: accountKey
+
+logging:
+  level:
+    root: error
+  path: /var/logs/
+  file: /var/logs/prod.log

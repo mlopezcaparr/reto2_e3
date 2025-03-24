@@ -24,18 +24,19 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "El tipo de cuenta no puede estar vacio")
+    @NotBlank(message = "Account must be not blank")
     private String type;
 
     @DateTimeFormat
-    @Past(message = "la fecha de apertura debe ser en el pasado")
+    @Past(message = "The Date of the account creation must be lower than current time")
     Date openingDate;
 
-    @NotNull
-    @Min(1)
+    @Min(value = 0, message = "Balance must be 0 or higher")
+    @NotNull(message = "Balance must be not null")
     private int balance;
 
-    @NotNull
+    @Min(value = 1, message = "Owner id must be 1 or higher")
+    @NotNull(message = "Owner id must be not null")
     private Long ownerId;
 
     @Transient

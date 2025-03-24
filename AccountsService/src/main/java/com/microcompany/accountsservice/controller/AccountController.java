@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 public class AccountController implements AccountControllerInterface {
+
     @Autowired
     AccountService serv;
 
@@ -20,94 +21,75 @@ public class AccountController implements AccountControllerInterface {
     public ResponseEntity getCuentaById(long uid, long cid) {
         Account ac = serv.getAccount(cid);
         if (ac != null & ac.getOwnerId() == uid) return ResponseEntity.status(HttpStatus.OK.value()).body(ac);
-        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cuenta no encontrada");
+        else throw new AccountNotfoundException("Account not found:");
     }
 
     @Override
     public ResponseEntity getUserCuentas(long uid) {
         List<Account> acs = serv.getAccountByOwnerId(uid);
         if (acs != null & acs.size() > 0) return ResponseEntity.status(HttpStatus.OK.value()).body(acs);
-        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cuentas de usuario " + uid + " no encontradas");
+        else throw new AccountNotfoundException("Accounts of user with id: " + uid + " not found");
     }
 
     @Override
     public ResponseEntity validateCuenta(long uid, int cant) {
-        boolean validated = isValidated(uid, cant);
-        return ResponseEntity.status(HttpStatus.OK).body(validated);
-    }
-
-    private boolean isValidated(long uid, int cant) {
-        boolean validated;
-        int balanceTotal = serv.getUserBalance(uid);
-        if (cant < balanceTotal * 0.8) validated = true;
-        else validated = false;
-        return validated;
+        if(serv.isValidated(uid, cant)) return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Valid", true));
+        else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Not valid", false));
     }
 
     @Override
-    public ResponseEntity addToAccount(Long ownerid, Long aid, int cantidad) {
-        Account account = serv.addBalance(aid, cantidad, ownerid);
-        if (!account.equals(null)) {
+    public ResponseEntity addToAccount(Long uid, Long cid, int cant) {
+        serv.addBalance(cid, cant, uid);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
+    }
+
+    @Override
+    public ResponseEntity removeFromAccount(Long uid, Long cid, int cant) {
+        Account account = serv.getAccount(cid);
+        if (serv.isValidated(account.getOwnerId(), cant)) {
+            serv.withdrawBalance(cid, cant, uid);
             return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
         } else {
-            return new ResponseEntity<>(new ApiResponse(), HttpStatus.NOT_MODIFIED);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ApiResponse("Cannot withdraw due to the balance exceeds the 80 percent of the loan", false));
         }
     }
 
     @Override
-    public ResponseEntity removeFromAccount(Long ownerid, Long aid, int cantidad) {
-        Account account = serv.getAccount(aid);
+    public ResponseEntity updateAccount(Long cid, Account ac) {
+        serv.updateAccount(cid, ac);
+        if (!ac.equals(null)) return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
+        else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Account can't be null", false));
+    }
 
-        if (isValidated(account.getOwnerId(), cantidad)) {
-            serv.withdrawBalance(aid, cantidad, ownerid);
+    @Override
+    public ResponseEntity createAccount(Account ac) {
+        if (serv.isValidated(ac.getOwnerId(), ac.getBalance())) {
+            serv.create(ac);
+            return ResponseEntity.status(HttpStatus.CREATED.value()).build();
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(String.format(
+                "User %d cannot create account with balance %d", ac.getOwnerId(), ac.getBalance()), false));
+    }
+
+    @Override
+    public ResponseEntity deleteAccount(Long uid, Long cid) {
+        Account cuenta = serv.getAccount(cid);
+        if (cuenta.getOwnerId() != uid)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(String.format(
+                    "No account with id %d for userId %d", cid, uid), false));
+        else
+            serv.delete(cid);
             return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
-        } else {
-            return new ResponseEntity<>(new ApiResponse("El balance superá el 80 por ciento", false),
-                    HttpStatus.NOT_MODIFIED);
-        }
-    }
-
-    @Override
-    public ResponseEntity updateAccount(Long aid, Account account) {
-        serv.updateAccount(aid, account);
-        if (!account.equals(null)) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
-        } else {
-            return new ResponseEntity<>(new ApiResponse(), HttpStatus.NOT_MODIFIED);
-        }
-    }
-
-    @Override
-    public ResponseEntity createAccount(Account account) {
-        if (isValidated(account.getOwnerId(), account.getBalance())) {
-            serv.create(account);
-            return new ResponseEntity(HttpStatus.CREATED);
-        }
-        return new ResponseEntity(new ApiResponse(String.format("User %d cannot create account with balance %d", account.getOwnerId(), account.getBalance()), false), HttpStatus.BAD_REQUEST);
-    }
-
-    @Override
-    public ResponseEntity deleteAccount(Long uid, Long cuentaId) {
-        Account cuenta = null;
-        try {
-            cuenta = serv.getAccount(cuentaId);
-            if (cuenta.getOwnerId() != uid) {
-                return new ResponseEntity(new ApiResponse(String.format("No account with id %d for userId %d", cuentaId, uid), false), HttpStatus.BAD_REQUEST);
-            }
-            serv.delete(cuentaId);
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        } catch (AccountNotfoundException e) {
-            return new ResponseEntity<>(new ApiResponse("No account found with id " + cuentaId, false), HttpStatus.NOT_FOUND);
-        }
     }
 
     @Override
     public ResponseEntity deleteUserAccounts(Long uid) {
         List<Account> userAccounts = serv.getAccountByOwnerId(uid);
-        if (userAccounts.isEmpty() || userAccounts.size() < 1) {
-            return new ResponseEntity(new ApiResponse("No accounts found for userId " + uid, false), HttpStatus.NOT_FOUND);
-        }
-        serv.deleteAccountsUsingOwnerId(uid);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        if (userAccounts.isEmpty() || userAccounts.size() < 1)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("No accounts found for userId " + uid, false));
+        else
+            serv.deleteAccountsUsingOwnerId(uid);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
     }
 }
