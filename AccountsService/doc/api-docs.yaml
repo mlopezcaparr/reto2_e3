@@ -1,0 +1,570 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:9900
+  description: Generated server url
+tags:
+- name: Endpoints Para API de Accounts
+  description: Endpoints para la gestión de cuentas de los usuarios
+paths:
+  /accounts/{uid}/withdraw:
+    put:
+      tags:
+      - Endpoints Para API de Accounts
+      summary: Método para extraer de cuentas
+      description: "Método que permite a un usuario extraer dinero de sus cuentas,\
+        \ si el método se ha ejecutado correctamente no devolverá contenido, si fallá\
+        \ devuelve un JSON o XML con los errores."
+      operationId: removeFromAccount
+      parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+          format: int64
+      - name: cid
+        in: query
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+          format: int64
+      - name: cantidad
+        in: query
+        required: false
+        schema:
+          minimum: 0
+          type: integer
+          format: int32
+      responses:
+        "404":
+          description: "Hubo un problema, no se puedo encontrar la cuenta o el usuario"
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "412":
+          description: Devolverá este error en caso de pasarle un parametro erróneo.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "204":
+          description: Se ha agregado la cantidad correctamente sin errores.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: No se pudo extraer la cantidad porque superá el montón permitido
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+  /accounts/{uid}/add:
+    put:
+      tags:
+      - Endpoints Para API de Accounts
+      summary: Método para añadir a una cuenta
+      description: "Método que permite a un usuario agregar dinero a una cuenta, si\
+        \ el método se ha ejecutado correctamente no devolverá contenido, si fallá\
+        \ devuelve un JSON o XML con los errores."
+      operationId: addToAccount
+      parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+          format: int64
+      - name: cid
+        in: query
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+          format: int64
+      - name: cantidad
+        in: query
+        required: false
+        schema:
+          minimum: 0
+          type: integer
+          format: int32
+      responses:
+        "404":
+          description: "Hubo un problema, no se puedo encontrar la cuenta o el usuario"
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "412":
+          description: Devolverá este error en caso de pasarle un parametro erróneo.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "204":
+          description: Se ha agregado la cantidad correctamente sin errores.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+  /accounts/{cid}:
+    put:
+      tags:
+      - Endpoints Para API de Accounts
+      summary: Método para actualizar cuentas
+      description: "Método que permite a actualizar la cuenta de un usuario pasando\
+        \ el id de dicha cuenta por parametros, si el método se ha ejecutado correctamente\
+        \ no devolverá contenido, si fallá devuelve un JSON o XML con los errores."
+      operationId: updateAccount
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountUpdateDto'
+        required: true
+      responses:
+        "404":
+          description: "Hubo un problema, no se puedo encontrar la cuenta asociada\
+            \ al id"
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "412":
+          description: Devolverá este error en caso de pasarle un parametro erróneo.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: La cuenta se paso como parametro de JSON vacío.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "204":
+          description: Se ha agregado la cantidad correctamente sin errores.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+  /accounts:
+    post:
+      tags:
+      - Endpoints Para API de Accounts
+      summary: Método para crear cuenta
+      description: "Método que permite crear una cuenta para un usuario pasando el\
+        \ id de dicha cuenta por parametros, si el método se ha ejecutado correctamente\
+        \ no devolverá contenido, si fallá devuelve un JSON o XML con los errores."
+      operationId: createAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountSimpleReqDto'
+        required: true
+      responses:
+        "201":
+          description: Se creado la cuenta correctamente sin errores.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: Devolverá este error si no puede crear una cuenta con el balance
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "412":
+          description: Devolverá este error en caso de pasarle un parametro erróneo.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+  /accounts/{uid}:
+    get:
+      tags:
+      - Endpoints Para API de Accounts
+      summary: Método pedir una cuenta del usuario
+      description: "Método para pedir una cuenta de un cliente pasando el id del cliente\
+        \ y el id de la cuenta, devuelve un JSON o XML."
+      operationId: getCuentaById
+      parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: cid
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "412":
+          description: Devolvera este error en caso de pasarle un parametro erróneo.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: "Si no existen, devolverá un mensaje de que no la encontrado."
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "200":
+          description: "Si existe, devolverá como resultado la cuenta."
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+    delete:
+      tags:
+      - Endpoints Para API de Accounts
+      summary: Método para borrar cuenta
+      description: "Método que permite borrar una cuenta para un usuario pasando el\
+        \ id de dicha cuenta y el del usuario por parametros, si el método se ha ejecutado\
+        \  correctamente no devolverá contenido, si fallá devuelve un JSON o XML con\
+        \ los errores."
+      operationId: deleteAccount
+      parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: cid
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "412":
+          description: Devolverá este error en caso de pasarle un parametro erróneo.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Devolverá este error si el usuario no es propietario.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Devolverá este error si no puedo encontrar una cuenta.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "204":
+          description: Se borra la cuenta correctamente sin errores.
+          content:
+            '*/*':
+              schema:
+                type: string
+  /accounts/{uid}/validate:
+    get:
+      tags:
+      - Endpoints Para API de Accounts
+      summary: Método para validar préstamo de un usuario
+      description: "Método que valida si un usuario puede extraer 'x' cantidad de\
+        \ dinero de sus cuentas, devuelve un JSON o XML."
+      operationId: validateCuenta
+      parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: cantidad
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          description: "Si no es valido, devolverá como resultado un mensaje de false."
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "412":
+          description: Devolverá este error en caso de pasarle un parametro erróneo.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "200":
+          description: "Si es valido, devolverá como resultado un mensaje de true."
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+  /accounts/{uid}/all:
+    get:
+      tags:
+      - Endpoints Para API de Accounts
+      summary: Método para pedir cuentas de un usuario
+      description: "Método que solicita las cuentas de un cliente pasando el id del\
+        \ cliente y delvuelve una lista de cuentas, devuelve un JSON o XML."
+      operationId: getUserCuentas
+      parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: "Si existe, devolverá como resultado la cuenta/las cuentas."
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccountSimpleDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountSimpleDto'
+        "404":
+          description: "Si no existen, devolverá un mensaje de que no la encontrado."
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        "412":
+          description: Devolverá este error en caso de pasarle un parametro erróneo.
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+    delete:
+      tags:
+      - Endpoints Para API de Accounts
+      summary: Método para borrar cuentas de usuario
+      description: "Método que permite borrar las cuentas de un usuario pasando el\
+        \ id del usuario por parametros, si el método se ha ejecutado  correctamente\
+        \ no devolverá contenido, si fallá devuelve un JSON o XML con los errores."
+      operationId: deleteUserAccounts
+      parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Se borrán la cuenta correctamente sin errores.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "412":
+          description: Devolverá este error en caso de pasarle un parametro erróneo.
+          content:
+            '*/*':
+              schema:
+                type: string
+        "404":
+          description: Devolverá este error si no encontró ninguna cuenta asociada
+            al usuario.
+          content:
+            '*/*':
+              schema:
+                type: string
+components:
+  schemas:
+    AccountUpdateDto:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Tipo de cuenta
+          example: Ahorro
+      description: Modelo para actualizar cuenta
+    AccountSimpleReqDto:
+      required:
+      - balance
+      - ownerId
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Tipo de cuenta
+          example: Ahorro
+        balance:
+          minimum: 0
+          type: integer
+          description: Cantidad de la cuenta
+          format: int32
+          example: 1000
+        ownerId:
+          minimum: 1
+          type: integer
+          description: Identicador del propietario de la cuenta
+          format: int64
+          example: 1
+      description: Modelo para crear una cuenta
+    AccountDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identificador de la cuenta
+          format: int64
+          example: 1
+        type:
+          type: string
+          description: Tipo de cuenta
+          example: Ahorro
+        openingDate:
+          type: string
+          description: Fecha de apertura de la cuenta
+          format: date-time
+        balance:
+          type: integer
+          description: Cantidad de la cuenta
+          format: int32
+          example: 1000
+        owner:
+          $ref: '#/components/schemas/CustomerDto'
+      description: Modelo de respuesta del detalle de la cuenta
+    CustomerDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nombre del propietario
+          example: Juan Garcia
+        email:
+          type: string
+          description: Email del propietario
+          example: juangarcia@mail.com
+      description: Modelo de respuesta del propietario de la cuenta
+    AccountSimpleDto:
+      required:
+      - balance
+      - ownerId
+      - type
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Identificador de la cuenta
+          format: int64
+          example: 1
+        type:
+          type: string
+          description: Tipo de cuenta
+          example: Ahorro
+        openingDate:
+          type: string
+          description: Fecha de apertura de la cuenta
+          format: date-time
+        balance:
+          minimum: 0
+          type: integer
+          description: Cantidad de la cuenta
+          format: int32
+          example: 1000
+        ownerId:
+          minimum: 1
+          type: integer
+          description: Identicador del propietario de la cuenta
+          format: int64
+          example: 1
+      description: Modelo de respuesta de cuenta simplificada

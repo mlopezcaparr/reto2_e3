@@ -1,7 +1,12 @@
 package com.microcompany.accountsservice.controller;
 
-import com.microcompany.accountsservice.model.Account;
+import com.microcompany.accountsservice.payload.AccountDto;
+import com.microcompany.accountsservice.payload.AccountSimpleDto;
+import com.microcompany.accountsservice.payload.AccountSimpleReqDto;
+import com.microcompany.accountsservice.payload.AccountUpdateDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +27,8 @@ public interface AccountControllerInterface {
     @Operation(summary = "Método pedir una cuenta del usuario", description = "Método para pedir una cuenta de un cliente" +
             " pasando el id del cliente y el id de la cuenta, devuelve un JSON o XML.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Si existe, devolverá como resultado la cuenta."),
+            @ApiResponse(responseCode = "200", description = "Si existe, devolverá como resultado la cuenta.",
+            content = @Content(schema = @Schema(implementation = AccountDto.class))),
             @ApiResponse(responseCode = "404", description = "Si no existen, devolverá un mensaje de que no la encontrado."),
             @ApiResponse(responseCode = "412", description = "Devolvera este error en caso de pasarle un parametro erróneo."),
     })
@@ -33,7 +39,8 @@ public interface AccountControllerInterface {
     @Operation(summary = "Método para pedir cuentas de un usuario", description = "Método que solicita las cuentas" +
             " de un cliente pasando el id del cliente y delvuelve una lista de cuentas, devuelve un JSON o XML.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Si existe, devolverá como resultado la cuenta/las cuentas."),
+            @ApiResponse(responseCode = "200", description = "Si existe, devolverá como resultado la cuenta/las cuentas.",
+            content = @Content(schema = @Schema(type = "array", implementation = AccountSimpleDto.class))),
             @ApiResponse(responseCode = "404", description = "Si no existen, devolverá un mensaje de que no la encontrado."),
             @ApiResponse(responseCode = "412", description = "Devolverá este error en caso de pasarle un parametro erróneo."),
     })
@@ -88,7 +95,7 @@ public interface AccountControllerInterface {
     })
     @PutMapping(value = "/{cid}", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity updateAccount(@Min(1) @PathVariable("cid") Long cid, @Valid @RequestBody Account account);
+    ResponseEntity updateAccount(@Min(1) @PathVariable("cid") Long cid, @Valid @RequestBody AccountUpdateDto accountRequest);
 
     @Operation(summary = "Método para crear cuenta", description = "Método que permite crear una cuenta para" +
             " un usuario pasando el id de dicha cuenta por parametros, si el método se ha ejecutado correctamente no" +
@@ -99,7 +106,7 @@ public interface AccountControllerInterface {
             @ApiResponse(responseCode = "412", description = "Devolverá este error en caso de pasarle un parametro erróneo."),
     })
     @PostMapping(produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity createAccount(@Valid @RequestBody Account account);
+    ResponseEntity createAccount(@Valid @RequestBody AccountSimpleReqDto accountRequest);
 
     @Operation(summary = "Método para borrar cuenta", description = "Método que permite borrar una cuenta para" +
             " un usuario pasando el id de dicha cuenta y el del usuario por parametros, si el método se ha ejecutado " +

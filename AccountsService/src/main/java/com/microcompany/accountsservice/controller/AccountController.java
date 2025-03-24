@@ -2,13 +2,15 @@ package com.microcompany.accountsservice.controller;
 
 import com.microcompany.accountsservice.exception.AccountNotfoundException;
 import com.microcompany.accountsservice.model.Account;
-import com.microcompany.accountsservice.payload.ApiResponse;
+import com.microcompany.accountsservice.payload.*;
 import com.microcompany.accountsservice.services.AccountService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -20,20 +22,31 @@ public class AccountController implements AccountControllerInterface {
     @Override
     public ResponseEntity getCuentaById(long uid, long cid) {
         Account ac = serv.getAccount(cid);
-        if (ac != null & ac.getOwnerId() == uid) return ResponseEntity.status(HttpStatus.OK.value()).body(ac);
+        AccountDto aResponse = new AccountDto();
+        BeanUtils.copyProperties(ac, aResponse);
+        CustomerDto ownerData = new CustomerDto();
+        aResponse.setOwner(ownerData);
+        if (ac != null & ac.getOwnerId() == uid) return ResponseEntity.status(HttpStatus.OK.value()).body(aResponse);
         else throw new AccountNotfoundException("Account not found:");
     }
 
     @Override
     public ResponseEntity getUserCuentas(long uid) {
         List<Account> acs = serv.getAccountByOwnerId(uid);
-        if (acs != null & acs.size() > 0) return ResponseEntity.status(HttpStatus.OK.value()).body(acs);
+        List<AccountSimpleDto> responseList = new ArrayList<>();
+        for (Account a : acs) {
+            AccountSimpleDto aResponse = new AccountSimpleDto();
+            BeanUtils.copyProperties(a, aResponse);
+            responseList.add(aResponse);
+        }
+        if (acs != null & acs.size() > 0) return ResponseEntity.status(HttpStatus.OK.value()).body(responseList);
         else throw new AccountNotfoundException("Accounts of user with id: " + uid + " not found");
     }
 
     @Override
     public ResponseEntity validateCuenta(long uid, int cant) {
-        if(serv.isValidated(uid, cant)) return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Valid", true));
+        if (serv.isValidated(uid, cant))
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Valid", true));
         else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Not valid", false));
     }
 
@@ -56,14 +69,14 @@ public class AccountController implements AccountControllerInterface {
     }
 
     @Override
-    public ResponseEntity updateAccount(Long cid, Account ac) {
+    public ResponseEntity updateAccount(Long cid, AccountUpdateDto ac) {
         serv.updateAccount(cid, ac);
         if (!ac.equals(null)) return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
         else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Account can't be null", false));
     }
 
     @Override
-    public ResponseEntity createAccount(Account ac) {
+    public ResponseEntity createAccount(AccountSimpleReqDto ac) {
         if (serv.isValidated(ac.getOwnerId(), ac.getBalance())) {
             serv.create(ac);
             return ResponseEntity.status(HttpStatus.CREATED.value()).build();
@@ -80,7 +93,7 @@ public class AccountController implements AccountControllerInterface {
                     "No account with id %d for userId %d", cid, uid), false));
         else
             serv.delete(cid);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
     }
 
     @Override
@@ -90,6 +103,6 @@ public class AccountController implements AccountControllerInterface {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("No accounts found for userId " + uid, false));
         else
             serv.deleteAccountsUsingOwnerId(uid);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
     }
 }

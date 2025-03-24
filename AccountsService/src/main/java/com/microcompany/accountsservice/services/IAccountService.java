@@ -1,11 +1,13 @@
 package com.microcompany.accountsservice.services;
 
 import com.microcompany.accountsservice.model.Account;
+import com.microcompany.accountsservice.payload.AccountSimpleReqDto;
+import com.microcompany.accountsservice.payload.AccountUpdateDto;
 
 import java.util.List;
 
 public interface IAccountService {
-    Account create(Account account);
+    Account create(AccountSimpleReqDto account);
 
     List<Account> getAccounts();
 
@@ -13,7 +15,7 @@ public interface IAccountService {
 
     List<Account> getAccountByOwnerId(Long ownerId);
 
-    Account updateAccount(Long id, Account account);
+    Account updateAccount(Long id, AccountUpdateDto account);
 
     Account addBalance(Long id, int amount, Long ownerId);
 

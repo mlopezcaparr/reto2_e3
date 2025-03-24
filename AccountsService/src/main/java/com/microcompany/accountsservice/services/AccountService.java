@@ -3,9 +3,12 @@ package com.microcompany.accountsservice.services;
 import com.microcompany.accountsservice.exception.AccountNotfoundException;
 import com.microcompany.accountsservice.model.Account;
 import com.microcompany.accountsservice.model.Customer;
+import com.microcompany.accountsservice.payload.AccountSimpleReqDto;
+import com.microcompany.accountsservice.payload.AccountUpdateDto;
 import com.microcompany.accountsservice.persistence.AccountRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +23,9 @@ public class AccountService implements IAccountService {
     private AccountRepository accountRepository;
 
     @Override
-    public Account create(Account account) {
+    public Account create(AccountSimpleReqDto accountReq) {
+        Account account = new Account();
+        BeanUtils.copyProperties(accountReq, account);
         Date current_Date = new Date();
         account.setOpeningDate(current_Date);
         return accountRepository.save(account);
@@ -45,9 +50,9 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public Account updateAccount(Long id, Account account) {
+    public Account updateAccount(Long id, AccountUpdateDto accountReq) {
         Account newAccount = accountRepository.findById(id).orElseThrow(() -> new AccountNotfoundException(id));
-        newAccount.setType(account.getType());
+        newAccount.setType(accountReq.getType());
         return accountRepository.save(newAccount);
     }
 
