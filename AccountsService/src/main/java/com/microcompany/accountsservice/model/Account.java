@@ -6,6 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
+import com.microcompany.accountsservice.contrains.AccountType;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -25,6 +26,7 @@ public class Account {
     private Long id;
 
     @NotBlank(message = "Account must be not blank")
+    @AccountType(message = "Type mut be 'Personal' or 'Company'")
     private String type;
 
     @DateTimeFormat

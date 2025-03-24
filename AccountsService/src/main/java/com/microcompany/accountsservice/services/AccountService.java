@@ -96,7 +96,7 @@ public class AccountService implements IAccountService {
         }
     }
 
-    public boolean isValidated(long uid, int cant) {
+    public boolean isValidatedAmount(long uid, int cant) {
         boolean validated;
         int balanceTotal = getUserBalance(uid);
         if (cant < balanceTotal * 0.8) validated = true;

@@ -33,7 +33,7 @@ public class AccountController implements AccountControllerInterface {
 
     @Override
     public ResponseEntity validateCuenta(long uid, int cant) {
-        if(serv.isValidated(uid, cant)) return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Valid", true));
+        if(serv.isValidatedAmount(uid, cant)) return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("Valid", true));
         else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Not valid", false));
     }
 
@@ -46,7 +46,7 @@ public class AccountController implements AccountControllerInterface {
     @Override
     public ResponseEntity removeFromAccount(Long uid, Long cid, int cant) {
         Account account = serv.getAccount(cid);
-        if (serv.isValidated(account.getOwnerId(), cant)) {
+        if (serv.isValidatedAmount(account.getOwnerId(), cant)) {
             serv.withdrawBalance(cid, cant, uid);
             return ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build();
         } else {
@@ -64,7 +64,7 @@ public class AccountController implements AccountControllerInterface {
 
     @Override
     public ResponseEntity createAccount(Account ac) {
-        if (serv.isValidated(ac.getOwnerId(), ac.getBalance())) {
+        if (serv.isValidatedAmount(ac.getOwnerId(), ac.getBalance())) {
             serv.create(ac);
             return ResponseEntity.status(HttpStatus.CREATED.value()).build();
         }
