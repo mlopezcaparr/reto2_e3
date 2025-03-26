@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import javax.security.auth.login.AccountException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,7 +30,12 @@ class AccountRepositoryTest {
         assertTrue(true);
     }
 
-    
+    @Test
+    void givenNullId_whenFindByOwnerId_thenReturnEmpty() throws Exception{
+       List<Account> acs = repo.findByOwnerId(null);
+       assertEquals(0, acs.size());
+    }
+
 
     @Test
     void givenValidId_whenGetSumAccounts_thenReturnSum() {
@@ -41,5 +45,11 @@ class AccountRepositoryTest {
             balance += a.getBalance();
         }
         assertEquals(balance, repo.getSumAccounts(2L));
+
+    }
+
+    @Test
+    void givenInvalidId_whenGetSumAccounts_thenReturnNull(){
+        assertNull(repo.getSumAccounts(-1));
     }
 }
