@@ -9,38 +9,44 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping(value = "/accounts", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
 @Validated
 public interface AccountControllerInterface {
 
-
-    @RequestMapping(value = "/{uid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity getCuentaById(@PathVariable("uid") long uid, @RequestParam long cid);
-
+    @RequestMapping(value = "/{uid}", method = RequestMethod.GET)
+    public ResponseEntity getCuentaById(@Min(value = 1, message = "Owner id must be 1 or higher") @PathVariable("uid") long uid,
+                                        @Min(value = 1, message = "Account id must be 1 or higher") @RequestParam long cid);
     @RequestMapping(value = "/{uid}/all", method = RequestMethod.GET)
-    public ResponseEntity getUserCuentas(@PathVariable("uid") long uid);
+    public ResponseEntity getUserCuentas(@Min(value = 1, message = "Owner id must be 1 or higher") @PathVariable("uid") long uid);
 
     @RequestMapping(value = "/{uid}/validate", method = RequestMethod.GET)
-    public ResponseEntity validateCuenta(@PathVariable("uid") long uid ,@RequestParam("cantidad") int cant);
+    public ResponseEntity validateCuenta(@Min(value = 1, message = "Owner id must be 1 or higher") @PathVariable("uid") long uid,
+                                         @Min(value = 0, message = "The amount of money must be higher 0 or higher")
+                                         @RequestParam("cantidad") int cant);
 
-    @PutMapping("/{ownerId}/add")
-    ResponseEntity addToAccount(@Min(1) @PathVariable("ownerId") Long cid, @Min(1) @RequestParam(value = "cuentaid") Long aid,
-                                @Min(0) @RequestParam(value = "cantidad", defaultValue = "") int cantidad);
+    @PutMapping(value = "/{uid}/add")
+    ResponseEntity addToAccount(@Min(value = 1, message = "Owner id must be 1 or higher") @PathVariable("uid") Long uid,
+                                @Min(value = 1, message = "Account id must be 1 or higher") @RequestParam(value = "cid") Long cid,
+                                @Min(value = 0, message = "The amount of money must be higher 0 or higher")
+                                @RequestParam(value = "cantidad", defaultValue = "") int cant);
 
-    @PutMapping("/{ownerId}/withdraw")
-    ResponseEntity removeFromAccount(@Min(1) @PathVariable("ownerId") Long cid, @Min(1) @RequestParam(value = "cuentaid") Long aid,
-                                @Min(0) @RequestParam(value = "cantidad", defaultValue = "") int cantidad);
+    @PutMapping(value = "/{uid}/withdraw")
+    ResponseEntity removeFromAccount(@Min(value = 1, message = "Owner id must be 1 or higher") @PathVariable("uid") Long uid,
+                                     @Min(value = 1, message = "Account id must be 1 or higher") @RequestParam(value = "cid") Long cid,
+                                     @Min(value = 0, message = "The amount of money must be higher 0 or higher")
+                                     @RequestParam(value = "cantidad", defaultValue = "") int cant);
 
-    @PutMapping(value = "/{cuentaId}", consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE})
-    ResponseEntity updateAccount(@Min(1) @PathVariable("cuentaId") Long aid, @Valid @RequestBody Account account);
+    @PutMapping(value = "/{cid}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    ResponseEntity updateAccount(@Min(value = 1, message = "Account id must be 1 or higher") @PathVariable("cid") Long cid,
+                                 @Valid @RequestBody Account account);
 
-    @PostMapping(consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
     ResponseEntity createAccount(@Valid @RequestBody Account account);
 
     @DeleteMapping("/{uid}")
-    ResponseEntity deleteAccount(@PathVariable("uid") Long uid, @RequestParam(value = "cuentaId") Long cuentaId);
+    ResponseEntity deleteAccount(@Min(value = 1, message = "Owner id must be 1 or higher") @PathVariable("uid") Long uid,
+                                 @Min(value = 1, message = "Account id must be 1 or higher") @RequestParam(value = "cid") Long cid);
 
     @DeleteMapping("/{uid}/all")
-    ResponseEntity deleteUserAccounts(@PathVariable("uid") Long uid);
+    ResponseEntity deleteUserAccounts(@Min(value = 1, message = "Owner id must be 1 or higher") @PathVariable("uid") Long uid);
 }

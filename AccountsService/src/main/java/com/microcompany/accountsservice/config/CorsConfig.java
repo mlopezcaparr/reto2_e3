@@ -12,7 +12,7 @@ public class CorsConfig {
     public WebMvcConfigurer  corsConfigures(){
         return new WebMvcConfigurer() {
             public void addCorsMapping(CorsRegistry registry){
-                registry.addMapping("/cuentas").allowedOrigins("*");
+                registry.addMapping("/accounts").allowedOrigins("*");
             }
         };
     }

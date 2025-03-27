@@ -54,18 +54,26 @@ public class AccountService implements IAccountService {
     @Override
     public Account addBalance(Long id, int amount, Long ownerId) {
         Account newAccount = accountRepository.findById(id).orElseThrow(() -> new AccountNotfoundException(id));
-        Customer owner = null;// Will be gotten from user service
-        int newBalance = newAccount.getBalance() + amount;
-        newAccount.setBalance(newBalance);
+        if(!ownerId.equals(newAccount.getOwnerId())) {
+            throw new AccountNotfoundException("Account not found");
+        } else {
+            Customer owner = null;// Will be gotten from user service
+            int newBalance = newAccount.getBalance() + amount;
+            newAccount.setBalance(newBalance);
+        }
         return accountRepository.save(newAccount);
     }
 
     @Override
     public Account withdrawBalance(Long id, int amount, Long ownerId) {
         Account newAccount = accountRepository.findById(id).orElseThrow(() -> new AccountNotfoundException(id));
-        Customer owner = null; // Will be gotten from user service
-        int newBalance = newAccount.getBalance() - amount;
-        newAccount.setBalance(newBalance);
+        if(!ownerId.equals(newAccount.getOwnerId())) {
+            throw new AccountNotfoundException("Account not found");
+        } else {
+            Customer owner = null; // Will be gotten from user service
+            int newBalance = newAccount.getBalance() - amount;
+            newAccount.setBalance(newBalance);
+        }
         return accountRepository.save(newAccount);
     }
 
@@ -88,5 +96,11 @@ public class AccountService implements IAccountService {
         }
     }
 
-
+    public boolean isValidatedAmount(long uid, int cant) {
+        boolean validated;
+        int balanceTotal = getUserBalance(uid);
+        if (cant < balanceTotal * 0.8) validated = true;
+        else validated = false;
+        return validated;
+    }
 }
