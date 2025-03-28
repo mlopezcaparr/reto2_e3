@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 @Configuration
-@EnableMethodSecurity(securedEnabled = false)
+@EnableMethodSecurity()
 public class ApplicationSecurity {
     private static final Logger logger = LoggerFactory.getLogger(ApplicationSecurity.class);
 
@@ -66,17 +66,19 @@ public class ApplicationSecurity {
 
         http
                 .authorizeHttpRequests((requests) -> requests
-                                .antMatchers("/auth/login",
-                                        "/docs/**",
-                                        "/users",
-                                        "/h2-ui/**",
-                                        "/configuration/ui",
-                                        "/swagger-resources/**",
-                                        "/configuration/security",
-                                        "/swagger-ui.html",
-                                        "/webjars/**"
-                                ).permitAll() // HABILITAR ESPACIOS LIBRES
-                                .anyRequest().authenticated()
+                        .antMatchers("/auth/login",
+                                "/docs/**",
+                                "/users",
+                                "/h2-ui/**",
+                                "/configuration/ui",
+                                "/swagger-resources/**",
+                                "/configuration/security",
+                                "/swagger-ui.html",
+                                "/webjars/**"
+                        ).permitAll()
+                        .antMatchers(HttpMethod.GET, "/accounts/**").hasAnyAuthority(ERole.CASHIER.name(), ERole.DIRECTOR.name())
+                        .antMatchers("/accounts/**").hasAnyAuthority(ERole.DIRECTOR.name())
+                        .anyRequest().authenticated()
                 );
 
         http.headers(headers ->
